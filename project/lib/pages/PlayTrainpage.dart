@@ -1,6 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:project/models/treino.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:project/models/exercicio.dart';
+import 'package:project/models/treino.dart';
+import 'package:project/pages/detalhe_exercicio_page.dart';
 class Playtrainpage extends StatefulWidget {
   // A lista de Exercicios com repetições e intervalo
   final Treino treino;
@@ -13,7 +16,11 @@ class PlaytrainpageState extends State<Playtrainpage> {
   late PageController _pageViewController;
 
   late List<List<bool>> _seriesConcluidasPorExercicio;
+   bool exercicioConcluido = false;
   int _paginaAtual = 0;
+  late int _tempoRestante;
+  Timer? _timer;
+  bool _timerAtivo = false;
 
   @override
   void initState() {
@@ -23,12 +30,58 @@ class PlaytrainpageState extends State<Playtrainpage> {
       (index) => [false, false, false], // 3 séries iniciais falsas
     );
     _pageViewController = PageController(initialPage: 0);
+
   }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _pageViewController.dispose();
     super.dispose();
+  }
+
+  void _reiniciarTimer() {
+    _timer?.cancel();
+    _tempoRestante = (widget.treino.exercicios[_paginaAtual].intervalo ?? 0) * 60;
+    _iniciarTimer();
+  }
+
+  void _iniciarTimer() {
+    if (_tempoRestante <= 0) return;
+
+    _timerAtivo = true;
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_tempoRestante <= 1) {
+        timer.cancel();
+        setState(() {
+          _tempoRestante = 0;
+          _timerAtivo = false;
+        });
+        return;
+      }
+
+      setState(() {
+        _tempoRestante--;
+      });
+    });
+  }
+
+  void _alternarTimer() {
+    if (_timerAtivo) {
+      _timer?.cancel();
+      setState(() {
+        _timerAtivo = false;
+      });
+    } else if (_tempoRestante > 0) {
+      _iniciarTimer();
+      setState(() {});
+    }
+  }
+
+  String _formatarTempo(int segundos) {
+    final minutos = segundos ~/ 60;
+    final segundosRestantes = segundos % 60;
+    return '${minutos.toString().padLeft(2, '0')}:${segundosRestantes.toString().padLeft(2, '0')}';
   }
 
   void upPage() {
@@ -50,6 +103,12 @@ class PlaytrainpageState extends State<Playtrainpage> {
     }
   }
 
+  bool verificaCheckBoxs(int value) {
+    return _seriesConcluidasPorExercicio[value].every(
+      (serieConcluida) => serieConcluida,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,11 +127,13 @@ class PlaytrainpageState extends State<Playtrainpage> {
         onPageChanged: (index) {
           setState(() {
             _paginaAtual = index;
+            exercicioConcluido = verificaCheckBoxs(index);
           });
+          _reiniciarTimer();
         },
         itemCount: widget.treino.exercicios.length,
         itemBuilder: (context, index) {
-          final exercicioatual = widget.treino.exercicios[index];
+          Exercicio exercicioatual = widget.treino.exercicios[index];
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -98,11 +159,7 @@ class PlaytrainpageState extends State<Playtrainpage> {
                         color: Colors.redAccent,
                       ),
                       // PENDENTE
-                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("É para ir na página do exercício"),
-                        ),
-                      ),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetalheExercicioPage(exercicio: exercicioatual),))
                     ),
                   ],
                 ),
@@ -128,7 +185,7 @@ class PlaytrainpageState extends State<Playtrainpage> {
                   children: [
                     Icon(Icons.alarm, color: Colors.red),
                     Text(
-                      " ${exercicioatual.intervalo}:00",
+                      _formatarTempo(_tempoRestante),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
@@ -138,6 +195,7 @@ class PlaytrainpageState extends State<Playtrainpage> {
                     ),
 
                     GestureDetector(
+                      onTap: _alternarTimer,
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
@@ -147,14 +205,13 @@ class PlaytrainpageState extends State<Playtrainpage> {
                         alignment: Alignment
                             .center, // Centraliza o ícone dentro da área de 48x48
                         child: Icon(
-                          Icons.pause_outlined,
+                          _timerAtivo
+                              ? Icons.pause_outlined
+                              : Icons.play_arrow_outlined,
                           size: 30,
                           color: const Color.fromARGB(255, 233, 110, 110),
                         ),
                       ),
-                      onTap: () => ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text('Pausar timer'))),
                     ),
                   ],
                 ),
@@ -214,11 +271,14 @@ class PlaytrainpageState extends State<Playtrainpage> {
                               value:
                                   _seriesConcluidasPorExercicio[index][serie -
                                       1],
-                              onChanged: (bool? valor) => setState(() {
-                                _seriesConcluidasPorExercicio[index][serie -
-                                        1] =
-                                    valor ?? false;
-                              }),
+                              onChanged: (bool? valor) {
+                                setState(() {
+                                  _seriesConcluidasPorExercicio[index][serie -
+                                      1] = valor ?? false;
+                                  exercicioConcluido = verificaCheckBoxs(index);
+                                  _reiniciarTimer();
+                                });
+                              },
                             ),
                           ],
                         ),
@@ -235,7 +295,7 @@ class PlaytrainpageState extends State<Playtrainpage> {
           border: Border(top: BorderSide(color: Colors.grey, width: 0.2)),
         ),
         child: Row(
-          children: [
+          children: [ 
             // Botão "Anterior" (ou "Próximo" dependendo da sua regra)
             Expanded(
               child: TextButton(
@@ -259,13 +319,24 @@ class PlaytrainpageState extends State<Playtrainpage> {
             // Botão "Finalizar / Próximo" com fundo vermelho (#e62e2d)
             Expanded(
               child: TextButton(
-                onPressed: _paginaAtual < widget.treino.exercicios.length - 1
-                    ? upPage
+                onPressed: exercicioConcluido
+                    ? () async {
+                        if (_paginaAtual <
+                            widget.treino.exercicios.length - 1) {
+                          upPage();
+                        }
+                        else{
+
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Treino concluido")));
+                          await Future.delayed(const Duration(seconds: 2 ));
+                          Navigator.pop(context);
+                        }
+                      }
                     : null,
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(
+                  backgroundColor: exercicioConcluido?  const Color(
                     0xFFE62E2D,
-                  ), // Cor primaria vermelha
+                  ) : Colors.grey , // Cor primaria vermelha
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.zero,
                   ),
@@ -285,7 +356,7 @@ class PlaytrainpageState extends State<Playtrainpage> {
                   ],
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
