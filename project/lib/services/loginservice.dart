@@ -6,13 +6,11 @@ import 'package:project/models/usuario.dart'; // Certifique-se de importar o mod
 // URL base da sua API
 const String _baseUrl ="http://127.0.0.1:8090/user/auth";
 
-/**
- * Realiza o login do usuário.
- * * @param email O email fornecido pelo usuário.
- * @param senha A senha fornecida pelo usuário.
- * @param context O contexto para exibir SnackBars.
- * @return O UserModel se o login for bem-sucedido, ou null caso contrário.
- */
+/// Realiza o login do usuário.
+/// * @param email O email fornecido pelo usuário.
+/// @param senha A senha fornecida pelo usuário.
+/// @param context O contexto para exibir SnackBars.
+/// @return O UserModel se o login for bem-sucedido, ou null caso contrário.
 Future<UserModel?> login(
   String email,
   String senha,
@@ -56,13 +54,12 @@ Future<UserModel?> login(
         return null;
       }
     } else if (result.statusCode == 401) {
-      // Credenciais Inválidas (Email não encontrado ou Senha incorreta)
-      // Seu backend retorna a mensagem de erro como uma String no body
-      String errorMessage = jsonDecode(result.body);
+     
+      String errorMessage =  "Email ou senha incorreto" ;
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("❌ $errorMessage")));
+      ).showSnackBar(SnackBar(content: Text("❌ $errorMessage"), duration: Duration(seconds: 2),));
       return null;
     } else {
       // Outros Erros de Servidor (400, 500 etc.)

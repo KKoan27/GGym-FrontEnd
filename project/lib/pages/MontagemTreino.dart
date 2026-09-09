@@ -67,7 +67,7 @@ class MontagemTreinoState extends State<MontagemTreino> {
                 children: [
                   ElevatedButton(
                     onPressed: (() async {
-                      final exerciciosSelecionados = await Navigator.push(
+                      final exerciciosSelecionados = await Navigator.push<List<Exercicio>>(
                         context,
                         MaterialPageRoute(
                           builder: (context) {
@@ -78,7 +78,7 @@ class MontagemTreinoState extends State<MontagemTreino> {
 
                       if (exerciciosSelecionados != null) {
                         final List<Exercicio> novosExercicios =
-                            exerciciosSelecionados as List<Exercicio>;
+                            exerciciosSelecionados;
 
                         // Converter em ExercicioComControles
                         final listaComControles = novosExercicios
