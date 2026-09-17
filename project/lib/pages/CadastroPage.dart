@@ -35,7 +35,7 @@ cadastrando = true;
 });
     // Aqui você conectaria com o backend
     // print("Cadastrando: ${_nomeController.text}, ${_emailController.text}");
-    var result = await register({
+   register({
       'nome': _nomeController.text,
       'email': _emailController.text,
       'senha': _senhaController.text,
@@ -185,7 +185,7 @@ cadastrando = true;
           (route) => false,
         );
       }
-    } on Exception catch (e) {
+    } on Exception  {
       rethrow;
     }
     finally{

@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:project/models/exercicio.dart';
 import 'package:project/pages/AdicionaExercicio.dart';
-import 'package:http/http.dart' as http;
 import 'package:project/models/usuario.dart';
+import 'package:project/services/treino_service.dart';
 
 class MontagemTreino extends StatefulWidget {
   final UserModel user;
@@ -19,19 +19,16 @@ class MontagemTreinoState extends State<MontagemTreino> {
   late TextEditingController descricaoTreino;
 
   String? selectItem;
-  List<Map<String, dynamic>> bodyExercicios = [];
+  List<ExercicioComControles> bodyExercicios = [];
+  final TreinoService _treinoService = TreinoService();
 
   @override
   void dispose() {
     nomeTreino.dispose();
     descricaoTreino.dispose();
-    for (var exercicio in bodyExercicios) {
-      if (exercicio.containsKey('intervalo')) {
-        (exercicio['intervalo'] as ValueNotifier).dispose();
-      }
-      if (exercicio.containsKey('repeticoes')) {
-        (exercicio['repeticoes'] as ValueNotifier).dispose();
-      }
+    // Limpar os controles de cada exercício
+    for (var item in bodyExercicios) {
+      item.dispose();
     }
     super.dispose();
   }
@@ -70,7 +67,7 @@ class MontagemTreinoState extends State<MontagemTreino> {
                 children: [
                   ElevatedButton(
                     onPressed: (() async {
-                      final exerciciosSelecionados = await Navigator.push(
+                      final exerciciosSelecionados = await Navigator.push<List<Exercicio>>(
                         context,
                         MaterialPageRoute(
                           builder: (context) {
@@ -80,21 +77,16 @@ class MontagemTreinoState extends State<MontagemTreino> {
                       );
 
                       if (exerciciosSelecionados != null) {
-                        final List<Map<String, dynamic>> novosExercicios =
-                            exerciciosSelecionados
-                                as List<Map<String, dynamic>>;
+                        final List<Exercicio> novosExercicios =
+                            exerciciosSelecionados;
 
-                        for (var exercicio in novosExercicios) {
-                          if (!exercicio.containsKey('intervalo')) {
-                            exercicio['intervalo'] = ValueNotifier<int>(0);
-                          }
-                          if (!exercicio.containsKey('repeticoes')) {
-                            exercicio['repeticoes'] = ValueNotifier<int>(0);
-                          }
-                        }
+                        // Converter em ExercicioComControles
+                        final listaComControles = novosExercicios
+                            .map((e) => ExercicioComControles(exercicio: e))
+                            .toList();
 
                         setState(() {
-                          bodyExercicios = novosExercicios;
+                          bodyExercicios = listaComControles;
                         });
                       }
                     }),
@@ -119,20 +111,15 @@ class MontagemTreinoState extends State<MontagemTreino> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
-                        final ValueNotifier<int> intervaloCrtl =
-                            bodyExercicios[index]['intervalo']
-                                as ValueNotifier<int>;
-                        final ValueNotifier<int> repeticoesCrtl =
-                            bodyExercicios[index]['repeticoes']
-                                as ValueNotifier<int>;
+                        final item = bodyExercicios[index];
+                        final ValueNotifier<int> intervaloCrtl = item.intervalo;
+                        final ValueNotifier<int> repeticoesCrtl = item.repeticoes;
 
                         return Card(
                           elevation: 2,
                           margin: const EdgeInsets.only(bottom: 8),
                           child: ListTile(
-                            title: Text(
-                              bodyExercicios[index]['nome'] as String,
-                            ),
+                            title: Text(item.exercicio.nome),
 
                             // 3. MUDANÇA: Reduzi de 250 para 170 para caber em telas menores
                             trailing: SizedBox(
@@ -212,8 +199,9 @@ class MontagemTreinoState extends State<MontagemTreino> {
                                           children: [
                                             InkWell(
                                               onTap: () {
-                                                if (repeticoesCrtl.value > 0)
+                                                if (repeticoesCrtl.value > 0) {
                                                   repeticoesCrtl.value -= 1;
+                                                }
                                               },
                                               child: Icon(
                                                 Icons.remove,
@@ -270,48 +258,21 @@ class MontagemTreinoState extends State<MontagemTreino> {
   }
 
   Future<void> treinoPOST(BuildContext context) async {
-    List<Map<String, dynamic>> exerciciosPayload = bodyExercicios.map((ex) {
-      int intervalo = (ex['intervalo'] as ValueNotifier<int>).value;
-      int repeticoes = (ex['repeticoes'] as ValueNotifier<int>).value;
-
-      return {
-        'id': ex['_id'],
-        'nome': ex['nome'],
-        'repeticoes': repeticoes,
-        'intervalo': intervalo,
-      };
-    }).toList();
-
-    final Map<String, dynamic> requestBody = {
-      'nome': widget.user.username,
-      'nomeTreino': nomeTreino.text,
-      'descricao': descricaoTreino.text,
-      'exercicios': exerciciosPayload,
-    };
-
-    final requestJson = jsonEncode(requestBody);
-
     try {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8090/api/treino'),
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        body: requestJson,
+      await _treinoService.criarTreino(
+        nomeTreino: nomeTreino.text,
+        descricao: descricaoTreino.text,
+        exercicios: bodyExercicios,
       );
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Treino criado com sucesso!")),
-        );
-        Navigator.pop(context, true);
-      } else {
-        throw Exception(
-          "Erro na requisição: ${response.statusCode}. Corpo: ${response.body}",
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Treino criado com sucesso!")),
+      );
+      Navigator.pop(context, true);
     } on Exception catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Erro na conexão: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro na conexão: $e")),
+      );
     }
   }
 

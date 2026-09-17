@@ -27,4 +27,8 @@ class ExercicioService {
 
     throw Exception('Falha ao carregar: ${response.statusCode}');
   }
-}
+
+
+List<Exercicio> filterExercicio(List<Exercicio> exercicios, String query){ 
+   return exercicios.where((e) => e.nome.toLowerCase().contains(query.toLowerCase())).toList();
+}}

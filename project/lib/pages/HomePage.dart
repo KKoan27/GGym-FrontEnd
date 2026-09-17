@@ -34,38 +34,27 @@ class _HomePageState extends State<HomePage> {
             _indiceAtual = novoIndice; // Atualiza a variável e redesenha a tela
           });
         },
+        
         items: [
-          BottomNavigationBarItem(
-            // Ícone padrão (Inativo)
-            icon: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.asset(
-                'assets/IconMusculo.png',
-                width: 24,
-                height: 24,
-                color: Colors.grey,
-              ),
-            ),
-            // Ícone Ativo (Com Zoom)
-            activeIcon: Transform.scale(
-              scale: 1.5,
-              child: Image.asset(
-                'assets/IconMusculo.png',
-                width: 24,
-                height: 24,
-                color: Color(0xFFE50000),
-              ),
-            ),
-            label: "Exercícios",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline),
-            label: "Criar Treino",
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Perfil"),
+          iconNavigationBarItem(Icons.fitness_center, "Exercicios"),
+          iconNavigationBarItem(Icons.assignment_rounded, "Treinos"),
+          iconNavigationBarItem(Icons.person, "Perfil")
         ],
       ),
     );
+  }
+
+  BottomNavigationBarItem iconNavigationBarItem(IconData icone, String label ) {
+    return BottomNavigationBarItem(
+          // Ícone padrão (Inativo)
+          icon: Icon(icone),
+          // Ícone Ativo (Com Zoom)
+          activeIcon: Transform.scale(
+            scale: 1.2,
+            child: Icon(icone)
+          ),
+          label: label,
+        );
   }
 
   // Método auxiliar que retorna o Widget correto baseado no índice

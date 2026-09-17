@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 
 List<Exercicio> exercicioFromJson(String str) {
   final decoded = json.decode(str);
@@ -48,8 +49,8 @@ class Exercicio {
   final String gifUrl;
   final List<String> dicas;
 
-  final int? repeticoes;
-  final int? intervalo;
+  int? repeticoes;
+   int? intervalo;
 
   Exercicio({
     this.id,
@@ -81,5 +82,24 @@ class Exercicio {
       repeticoes: json['repeticoes'] as int?,
       intervalo: json['intervalo'] as int?,
     );
+  }
+}
+
+/// Classe Wrapper que encapsula um Exercicio com seus controles reativo
+class ExercicioComControles {
+  final Exercicio exercicio;
+  final ValueNotifier<int> intervalo;
+  final ValueNotifier<int> repeticoes;
+
+  ExercicioComControles({
+    required this.exercicio,
+    int? intervaloInicial,
+    int? repeticoesInicial,
+  })  : intervalo = ValueNotifier(intervaloInicial ?? exercicio.intervalo ?? 0),
+        repeticoes = ValueNotifier(repeticoesInicial ?? exercicio.repeticoes ?? 0);
+
+  void dispose() {
+    intervalo.dispose();
+    repeticoes.dispose();
   }
 }

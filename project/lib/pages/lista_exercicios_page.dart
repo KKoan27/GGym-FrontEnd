@@ -19,6 +19,7 @@ class _ListaExerciciosPageState extends State<ListaExerciciosPage> {
   // Armazeno o Future numa variável para evitar que a requisição
   // seja refeita toda vez que o teclado abre ou a tela recarrega (build).
   late Future<List<Exercicio>> _futureExercicios;
+   String search = "";
 
   // [TÉCNICO] Controlador para ler o texto do input de busca.
   final TextEditingController _searchController = TextEditingController();
@@ -66,7 +67,11 @@ class _ListaExerciciosPageState extends State<ListaExerciciosPage> {
           child: TextField(
             controller: _searchController,
             onChanged: (value) {
-              _realizarPesquisa();
+              setState((){
+search = value;
+              });
+
+              
             },
             // O decoration é uma propriedade do TextField, fica fora do onChanged
             decoration: const InputDecoration(
@@ -125,15 +130,16 @@ class _ListaExerciciosPageState extends State<ListaExerciciosPage> {
 
           // 4. SUCESSO
           final exercicios = snapshot.data!;
+          final exerciciosFilter = _exercicioService.filterExercicio(exercicios, search);
 
           // [PERFORMANCE] ListView.separated é melhor que ListView padrão para listas grandes
           // pois renderiza apenas o que está na tela.
           return ListView.separated(
             padding: const EdgeInsets.all(16),
-            itemCount: exercicios.length,
+            itemCount: exerciciosFilter.length,
             separatorBuilder: (_, __) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
-              final exercicio = exercicios[index];
+              final exercicio = exerciciosFilter[index];
               return _buildExercicioCard(context, exercicio);
             },
           );
