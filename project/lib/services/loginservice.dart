@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:project/models/usuario.dart'; // Certifique-se de importar o modelo
 
 // URL base da sua API
-const String _baseUrl ="http://127.0.0.1:8090/user/auth";
+const String _baseUrl ="https://ggym-backend.onrender.com/user/auth";
 
 /// Realiza o login do usuário.
 /// * @param email O email fornecido pelo usuário.

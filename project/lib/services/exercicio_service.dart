@@ -3,7 +3,7 @@ import 'package:project/models/exercicio.dart';
 import 'package:project/models/usuario.dart';
 
 class ExercicioService {
-  final String _baseUrl = 'http://127.0.0.1:8090/api/getexercicios';
+  final String _baseUrl = 'https://ggym-backend.onrender.com/api/getexercicios';
 
   Future<List<Exercicio>> fetchExercicios({String query = ''}) async {
     final user = await UserModel.loadFromPrefs();

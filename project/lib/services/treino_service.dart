@@ -5,7 +5,7 @@ import 'package:project/models/treino.dart';
 import 'package:project/models/usuario.dart';
 
 class TreinoService {
-  final String _baseUrl = 'http://127.0.0.1:8090/api/treino';
+  final String _baseUrl = 'https://ggym-backend.onrender.com/api/treino';
 
   Future<List<Treino>> fetchTreinos() async {
     final user = await UserModel.loadFromPrefs();

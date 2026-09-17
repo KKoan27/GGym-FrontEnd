@@ -162,7 +162,7 @@ cadastrando = true;
 
     try {
       var result = await http.post(
-        Uri.parse("http://127.0.0.1:8090/user/register"),
+        Uri.parse("https://ggym-backend.onrender.com/user/register"),
         body: jsonEncode(requestbody),
         headers: {'Content-Type': 'application/json'},
       );
