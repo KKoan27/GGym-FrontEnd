@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:project/models/exercicio.dart';
 import 'package:project/models/treino.dart';
-import 'package:project/pages/detalhe_exercicio_page.dart';
+import 'package:project/pages/detalheExerciciosPage.dart';
 
 class Playtrainpage extends StatefulWidget {
   // A lista de Exercicios com repetições e intervalo
