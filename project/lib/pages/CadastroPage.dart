@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:project/pages/login.dart';
+import 'package:project/pages/loginPage.dart';
 import 'package:http/http.dart' as http;
+
+import 'package:project/services/user_service.dart';
 
 class CadastroPage extends StatefulWidget {
   const CadastroPage({super.key});
@@ -20,7 +22,7 @@ class _CadastroPageState extends State<CadastroPage> {
 
   void _realizarCadastro() async {
 
-
+try{
 
     // Validação básica
     if (_senhaController.text != _confirmaSenhaController.text) {
@@ -35,7 +37,9 @@ cadastrando = true;
 });
     // Aqui você conectaria com o backend
     // print("Cadastrando: ${_nomeController.text}, ${_emailController.text}");
-   register({
+
+    
+register({
       'nome': _nomeController.text,
       'email': _emailController.text,
       'senha': _senhaController.text,
@@ -43,7 +47,19 @@ cadastrando = true;
 
 
     // Vai direto para a Home após cadastro
+  } on Exception {
+ScaffoldMessenger.of(
+          context,
+                  ).showSnackBar(SnackBar(content: Text("Erro ao cadastrar!")));
+   
+    } finally{
+      setState((){
+cadastrando = false;
+});
+    }
   }
+
+   
 
   @override
   Widget build(BuildContext context) {
@@ -153,45 +169,5 @@ cadastrando = true;
     );
   }
 
-  Future<void> register(Map<String, String> body, BuildContext context) async {
-    Map<String, String?> requestbody = {
-      "nome": body['nome'],
-      "email": body['email'],
-      "senha": body['senha'],
-    };
-
-    try {
-      var result = await http.post(
-        Uri.parse("https://ggym-backend.onrender.com/user/register"),
-        body: jsonEncode(requestbody),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      print(result.body);
-      print(result.statusCode);
-      if (result.statusCode == 400) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Erro ao cadastrar!")));
-        throw Exception("erro na requisição : ${result.body}");
-      } else if (result.statusCode == 200) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Cadastro completo!")));
-
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-          (route) => false,
-        );
-      }
-    } on Exception  {
-      rethrow;
-    }
-    finally{
-      setState((){
-cadastrando = false;
-});
-    }
-  }
+  
 }

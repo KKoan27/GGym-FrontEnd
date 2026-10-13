@@ -1,16 +1,22 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:project/models/usuario.dart'; // Certifique-se de importar o modelo
+import 'package:project/models/usuario.dart';
+import 'package:project/pages/loginPage.dart'; // Certifique-se de importar o modelo
 
-// URL base da sua API
-const String _baseUrl ="https://ggym-backend.onrender.com/user/auth";
 
-/// Realiza o login do usuário.
-/// * @param email O email fornecido pelo usuário.
-/// @param senha A senha fornecida pelo usuário.
-/// @param context O contexto para exibir SnackBars.
-/// @return O UserModel se o login for bem-sucedido, ou null caso contrário.
+
+
+
+
+class UserServiceClient {
+
+  String baseUrl;
+
+  UserServiceClient(this.baseUrl);
+
+
+
 Future<UserModel?> login(
   String email,
   String senha,
@@ -19,7 +25,7 @@ Future<UserModel?> login(
   final Map<String, String> requestBody = {"email": email, "senha": senha};
 
   // Seu backend usa "authuser" como op (operação), vamos usá-lo na URL
-  final Uri uri = Uri.parse(_baseUrl);
+  final Uri uri = Uri.parse(baseUrl);
 
   try {
     var result = await http.post(
@@ -85,3 +91,55 @@ Future<UserModel?> login(
     return null;
   }
 }
+
+}
+
+Future<void> register(Map<String, String> body, BuildContext context) async {
+    Map<String, String?> requestbody = {
+      "nome": body['nome'],
+      "email": body['email'],
+      "senha": body['senha'],
+    };
+
+    try {
+      var result = await http.post(
+        Uri.parse("https://ggym-backend.onrender.com/user/register"),
+        body: jsonEncode(requestbody),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      print(result.body);
+      print(result.statusCode);
+      if (result.statusCode == 400) {
+        ScaffoldMessenger.of(
+          context,
+                  ).showSnackBar(SnackBar(content: Text("Erro ao cadastrar!")));
+        throw Exception("erro na requisição : ${result.body}");
+      } else if (result.statusCode == 200) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Cadastro completo!")));
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+          (route) => false,
+        );
+      }
+   
+   
+  } on Exception{
+    rethrow;
+
+  }
+}
+
+
+
+// URL base da sua API
+
+/// Realiza o login do usuário.
+/// * @param email O email fornecido pelo usuário.
+/// @param senha A senha fornecida pelo usuário.
+/// @param context O contexto para exibir SnackBars.
+/// @return O UserModel se o login for bem-sucedido, ou null caso contrário.

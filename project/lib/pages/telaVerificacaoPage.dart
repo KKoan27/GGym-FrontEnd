@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'NovaSenhaPage.dart'; // Próximo passo do fluxo
+import 'novaSenhaPage.dart'; // Próximo passo do fluxo
 
 class TelaVerificacao extends StatefulWidget {
   const TelaVerificacao({super.key});

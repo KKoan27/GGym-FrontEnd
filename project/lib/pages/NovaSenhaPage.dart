@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'loginPage.dart';
 
 class NovaSenhaPage extends StatefulWidget {
   const NovaSenhaPage({super.key});

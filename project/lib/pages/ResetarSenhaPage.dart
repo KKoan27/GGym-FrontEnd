@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'TelaVerificacao.dart';
+import 'telaVerificacaoPage.dart';
 
 class ResetarSenhaPage extends StatefulWidget {
   const ResetarSenhaPage({super.key});

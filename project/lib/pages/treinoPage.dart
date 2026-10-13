@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project/models/treino.dart';
 import 'package:project/models/usuario.dart';
-import 'package:project/pages/MontagemTreino.dart';
-import 'package:project/pages/PlayTrainpage.dart';
+import 'package:project/pages/montagemTreino.dart';
+import 'package:project/pages/playTrainpage.dart';
 import 'package:project/services/treino_service.dart';
 
 class TreinoPage extends StatefulWidget {

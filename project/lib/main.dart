@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'pages/login.dart';
-import 'package:project/pages/AdicionaExercicio.dart';
+import 'pages/loginPage.dart';
+import 'package:project/pages/adicionaExercicio.dart';
 // import 'package:project/pages/HomePage.dart';
 // import 'package:project/pages/MontagemTreino.dart';
 

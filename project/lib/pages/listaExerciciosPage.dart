@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project/models/exercicio.dart';
 import 'package:project/services/exercicio_service.dart';
-import 'package:project/pages/detalhe_exercicio_page.dart';
+import 'package:project/pages/detalheExerciciosPage.dart';
 
 class ListaExerciciosPage extends StatefulWidget {
   const ListaExerciciosPage({super.key});
