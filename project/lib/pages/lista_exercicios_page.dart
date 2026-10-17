@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project/models/exercicio.dart';
 import 'package:project/services/exercicio_service.dart';
 import 'package:project/pages/detalhe_exercicio_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ListaExerciciosPage extends StatefulWidget {
   final ExercicioService exercicioService;
@@ -21,6 +22,7 @@ class _ListaExerciciosPageState extends State<ListaExerciciosPage> {
   // Armazeno o Future numa variável para evitar que a requisição
   // seja refeita toda vez que o teclado abre ou a tela recarrega (build).
   late Future<List<Exercicio>> _futureExercicios;
+  static List<Exercicio>? _cacheLocalExercicios;
   String search = "";
 
   // [TÉCNICO] Controlador para ler o texto do input de busca.
@@ -29,10 +31,19 @@ class _ListaExerciciosPageState extends State<ListaExerciciosPage> {
   @override
   void initState() {
     super.initState();
-    // [TÉCNICO] Carrega a lista completa ao iniciar a tela.
 
     _service = widget.exercicioService;
-    _futureExercicios = _service.fetchExercicios();
+
+    if (_cacheLocalExercicios != null) {
+      // Se já temos os dados salvos estaticamente, usamos eles sem chamar o serviço
+      _futureExercicios = Future.value(_cacheLocalExercicios!);
+    } else {
+      // Se não temos, buscamos do serviço e guardamos no cache estático
+      _futureExercicios = _service.fetchExercicios().then((dados) {
+        _cacheLocalExercicios = dados;
+        return dados;
+      });
+    }
   }
 
   @override

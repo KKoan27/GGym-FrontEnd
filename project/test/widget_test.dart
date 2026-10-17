@@ -69,13 +69,12 @@ void main() {
 
     // Passando para a tela de Treino
     await tester.tap(find.text('Treinos'));
-    // Use um pump com tempo determinado:
-    await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(find.text('Exercicios'));
-    await tester.pump(const Duration(milliseconds: 300));
 
+    await tester.pump(Duration(seconds: 2));
+    await tester.tap(find.text('Exercicios'));
+    await tester.pump(Duration(seconds: 2));
     expect(find.byType(ListaExerciciosPage), findsOneWidget);
 
-    verify(() => mockExercicioService.fetchExercicios()).called(2);
+    verify(() => mockExercicioService.fetchExercicios()).called(1);
   });
 }

@@ -9,6 +9,7 @@ class ExercicioService {
     final user = await UserModel.loadFromPrefs();
     final token = user?.token ?? '';
 
+    //Replace serve para quando tiver search
     final uri = Uri.parse(_baseUrl).replace(
       queryParameters: query.trim().isEmpty ? null : {'q': query.trim()},
     );
@@ -28,7 +29,9 @@ class ExercicioService {
     throw Exception('Falha ao carregar: ${response.statusCode}');
   }
 
-
-List<Exercicio> filterExercicio(List<Exercicio> exercicios, String query){ 
-   return exercicios.where((e) => e.nome.toLowerCase().contains(query.toLowerCase())).toList();
-}}
+  List<Exercicio> filterExercicio(List<Exercicio> exercicios, String query) {
+    return exercicios
+        .where((e) => e.nome.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+  }
+}
