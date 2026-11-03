@@ -19,9 +19,6 @@ class _CadastroPageState extends State<CadastroPage> {
   bool cadastrando = false;
 
   void _realizarCadastro() async {
-
-
-
     // Validação básica
     if (_senhaController.text != _confirmaSenhaController.text) {
       ScaffoldMessenger.of(
@@ -30,17 +27,16 @@ class _CadastroPageState extends State<CadastroPage> {
       return;
     }
 
-setState((){
-cadastrando = true;
-});
+    setState(() {
+      cadastrando = true;
+    });
     // Aqui você conectaria com o backend
     // print("Cadastrando: ${_nomeController.text}, ${_emailController.text}");
-   register({
+    register({
       'nome': _nomeController.text,
       'email': _emailController.text,
       'senha': _senhaController.text,
     }, context);
-
 
     // Vai direto para a Home após cadastro
   }
@@ -56,7 +52,6 @@ cadastrando = true;
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      // Stack para manter o fundo se quiser adicionar as imagens de background depois
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(30.0),
@@ -116,18 +111,19 @@ cadastrando = true;
                   ),
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child:  cadastrando ?CircularProgressIndicator(
-                          color: Colors.white, // Cor do indicador
-                          strokeWidth: 2.5,
-                        ):
-                         const Text(
-                  'Cadastrar',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                child: cadastrando
+                    ? CircularProgressIndicator(
+                        color: Colors.white, // Cor do indicador
+                        strokeWidth: 2.5,
+                      )
+                    : const Text(
+                        'Cadastrar',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
               ),
             ],
           ),
@@ -185,13 +181,12 @@ cadastrando = true;
           (route) => false,
         );
       }
-    } on Exception  {
+    } on Exception {
       rethrow;
-    }
-    finally{
-      setState((){
-cadastrando = false;
-});
+    } finally {
+      setState(() {
+        cadastrando = false;
+      });
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 // Certifique-se de que este import aponte para sua classe UserModel
 import 'package:project/models/usuario.dart';
+import 'package:project/services/exercicio_service.dart';
 import 'package:project/services/loginservice.dart';
 import 'ResetarSenhaPage.dart';
 import 'CadastroPage.dart';
@@ -49,7 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushAndRemoveUntil(
         context,
         // Usamos o 'pushAndRemoveUntil' para que o usuário não volte para o Login
-        MaterialPageRoute(builder: (context) => HomePage(user: user)),
+        MaterialPageRoute(
+          builder: (context) =>
+              HomePage(user: user, exercicioService: ExercicioService()),
+        ),
         (route) => false, // Remove todas as rotas anteriores
       );
     }

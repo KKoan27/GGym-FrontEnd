@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <title>IziGym - Montar Treino</title>
+    <!-- Tailwind CSS v3 CDN with forms plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#DC2626',
+                            activeRed: '#E11D48',
+                            orangeRed: '#E53E3E',
+                            darkBg: '#050709',
+                            cardBg: '#111317',
+                            inputBg: '#15171C',
+                            borderDark: '#22252C'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Phosphor Icons for iOS-style clean fitness icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style data-purpose="custom-layout">
+        /* Custom curved red border accent inspired by the design */
+        .curved-accent-border {
+            position: relative;
+        }
+
+        .curved-accent-border::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            bottom: 6px;
+            width: 4px;
+            background: linear-gradient(180deg, #E53E3E 0%, #DC2626 70%, #991B1B 100%);
+            border-radius: 4px;
+        }
+
+        /* Hide scrollbar for clean mobile app preview */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-black text-white font-sans antialiased flex justify-center items-center min-h-screen p-0 sm:p-4 selection:bg-red-600 selection:text-white">
+    <!-- BEGIN: MobileDeviceFrame -->
+    <main
+        class="w-full max-w-[430px] h-screen sm:h-[915px] bg-[#07090C] sm:rounded-[44px] overflow-hidden flex flex-col relative border-0 sm:border-8 sm:border-[#1E2024] shadow-2xl">
+        <!-- BEGIN: iOSStatusBar -->
+        <header class="w-full pt-3 px-7 flex justify-between items-center z-30 select-none shrink-0"
+            data-purpose="status-bar">
+            <span class="text-xs font-semibold tracking-tight text-white/90">9:41</span>
+            <!-- Dynamic Island / Speaker Pill -->
+            <div class="w-24 h-4 bg-black/80 rounded-full mx-auto hidden sm:block border border-white/5"></div>
+            <div class="flex items-center gap-1.5 text-xs text-white/90">
+                <i class="ph-bold ph-cellular-signal-full text-xs"></i>
+                <i class="ph-bold ph-wifi-high text-xs"></i>
+                <i class="ph-fill ph-battery-full text-sm"></i>
+            </div>
+        </header>
+        <!-- END: iOSStatusBar -->
+        <!-- BEGIN: TopBar -->
+        <nav class="w-full px-5 py-3 flex items-center justify-between z-20 shrink-0" data-purpose="navigation-header">
+            <button
+                class="flex items-center gap-1.5 text-white hover:text-red-500 transition-colors py-1 group focus:outline-none"
+                type="button">
+                <i class="ph-bold ph-caret-left text-xl group-hover:-translate-x-0.5 transition-transform"></i>
+                <span class="text-base font-medium tracking-tight">Cancelar</span>
+            </button>
+            <h1 class="text-base font-semibold text-white/90 pr-6">Criar Novo Treino</h1>
+            <div class="w-4"></div> <!-- visual balance placeholder -->
+        </nav>
+        <!-- END: TopBar -->
+        <!-- BEGIN: ScrollableContent -->
+        <div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-28 pt-1 flex flex-col gap-4">
+            <!-- BEGIN: TrainingMetadataInputs -->
+            <section class="flex flex-col gap-3" data-purpose="treino-info-inputs">
+                <!-- Input: Título -->
+                <div
+                    class="bg-[#121418] rounded-xl px-4 py-3 border border-[#20232B] focus-within:border-red-600/80 transition-colors shadow-sm">
+                    <label class="block text-[11px] font-medium text-neutral-400 tracking-wide uppercase"
+                        for="treino-titulo">Título</label>
+                    <input
+                        class="w-full bg-transparent border-0 p-0 text-white text-sm font-medium focus:ring-0 focus:outline-none placeholder-neutral-500 mt-0.5"
+                        id="treino-titulo" placeholder="Exemplo: treino focado peito" type="text"
+                        value="Treino A - Focado em Peito e Tríceps" />
+                </div>
+                <!-- Input: Descrição -->
+                <div
+                    class="bg-[#121418] rounded-xl px-4 py-3 border border-[#20232B] focus-within:border-red-600/80 transition-colors shadow-sm">
+                    <label class="block text-[11px] font-medium text-neutral-400 tracking-wide uppercase"
+                        for="treino-descricao">Descrição (Opcional)</label>
+                    <input
+                        class="w-full bg-transparent border-0 p-0 text-white text-sm font-normal focus:ring-0 focus:outline-none placeholder-neutral-500 mt-0.5"
+                        id="treino-descricao" placeholder="Exemplo: 5 exercícios • Foco: Hipertrofia" type="text"
+                        value="5 exercícios • Foco: Hipertrofia &amp; Força" />
+                </div>
+            </section>
+            <!-- END: TrainingMetadataInputs -->
+            <!-- BEGIN: ExerciseSectionHeader -->
+            <div class="flex items-center justify-between pt-2 px-1">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-600"></span>
+                    <h2 class="text-sm font-semibold tracking-wide uppercase text-neutral-300">Exercícios Selecionados
+                    </h2>
+                </div>
+                <span
+                    class="text-xs bg-red-950/60 text-red-400 px-2.5 py-0.5 rounded-full font-medium border border-red-800/40">5
+                    itens</span>
+            </div>
+            <!-- END: ExerciseSectionHeader -->
+            <!-- BEGIN: ExerciseList -->
+            <section class="flex flex-col gap-3.5" data-purpose="exercise-cards-list">
+                <!-- Card 1: Puxada Frontal -->
+                <article
+                    class="bg-[#111317] rounded-2xl p-3.5 border border-[#1E2128] relative shadow-lg overflow-hidden group">
+                    <div class="flex gap-3.5 items-center">
+                        <!-- Thumbnail Visual -->
+                        <div
+                            class="w-20 h-20 rounded-xl bg-[#090B0D] border border-white/5 flex items-center justify-center shrink-0 p-1 relative overflow-hidden">
+                            <!-- Provided Lat Pulldown image representation / camera fallback -->
+                            <div class="w-full h-full flex flex-col items-center justify-center text-red-500/80">
+                                <i class="ph-fill ph-barbell text-3xl"></i>
+                            </div>
+                        </div>
+                        <!-- Content & Controls -->
+                        <div class="flex-1 pl-2.5 curved-accent-border flex flex-col gap-2">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-sm font-bold text-white tracking-tight leading-snug">Puxada Frontal
+                                        Aberta</h3>
+                                    <p class="text-[11px] text-neutral-400">Dorsal</p>
+                                </div>
+                                <button aria-label="Remover exercício"
+                                    class="text-neutral-500 hover:text-red-400 text-xs transition-colors p-1"
+                                    type="button">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                            </div>
+                            <!-- Interactive Steppers Row -->
+                            <div class="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/5">
+                                <!-- Stepper: Repetições -->
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Reps</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementValue('reps-1')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="reps-1">10</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementValue('reps-1')" type="button">+</button>
+                                    </div>
+                                </div>
+                                <!-- Stepper: Intervalo -->
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span
+                                        class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Intervalo (min)</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementInterval('rest-1')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="rest-1">1 min</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementInterval('rest-1')" type="button">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- Card 2: Supino Reto com Barra -->
+                <article
+                    class="bg-[#111317] rounded-2xl p-3.5 border border-[#1E2128] relative shadow-lg overflow-hidden group">
+                    <div class="flex gap-3.5 items-center">
+                        <!-- Camera / Photo Placeholder Icon (Match with visual in Reference) -->
+                        <div
+                            class="w-20 h-20 rounded-xl bg-[#090B0D] border border-white/5 flex flex-col items-center justify-center shrink-0 p-2 text-white/80">
+                            <i class="ph-fill ph-camera text-3xl text-neutral-300"></i>
+                            <span class="text-[9px] text-neutral-500 font-medium mt-1">Sem foto</span>
+                        </div>
+                        <!-- Content & Controls -->
+                        <div class="flex-1 pl-2.5 curved-accent-border flex flex-col gap-2">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-sm font-bold text-white tracking-tight leading-snug">Supino Reto com
+                                        Barra</h3>
+                                    <p class="text-[11px] text-neutral-400">Peitoral Maior</p>
+                                </div>
+                                <button aria-label="Remover exercício"
+                                    class="text-neutral-500 hover:text-red-400 text-xs transition-colors p-1"
+                                    type="button">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                            </div>
+                            <!-- Interactive Steppers Row -->
+                            <div class="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/5">
+                                <!-- Stepper: Repetições -->
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Reps</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementValue('reps-2')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="reps-2">12</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementValue('reps-2')" type="button">+</button>
+                                    </div>
+                                </div>
+                                <!-- Stepper: Intervalo -->
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span
+                                        class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Intervalo (min)</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementInterval('rest-2')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="rest-2">2 min</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementInterval('rest-2')" type="button">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- Card 3: Desenvolvimento com Halteres -->
+                <article
+                    class="bg-[#111317] rounded-2xl p-3.5 border border-[#1E2128] relative shadow-lg overflow-hidden group">
+                    <div class="flex gap-3.5 items-center">
+                        <!-- Camera / Photo Placeholder Icon (Match with visual in Reference) -->
+                        <div
+                            class="w-20 h-20 rounded-xl bg-[#090B0D] border border-white/5 flex flex-col items-center justify-center shrink-0 p-2 text-white/80">
+                            <i class="ph-fill ph-camera text-3xl text-neutral-300"></i>
+                            <span class="text-[9px] text-neutral-500 font-medium mt-1">Sem foto</span>
+                        </div>
+                        <!-- Content & Controls -->
+                        <div class="flex-1 pl-2.5 curved-accent-border flex flex-col gap-2">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-sm font-bold text-white tracking-tight leading-snug">Desenvolvimento
+                                        Halteres</h3>
+                                    <p class="text-[11px] text-neutral-400">Deltoides</p>
+                                </div>
+                                <button aria-label="Remover exercício"
+                                    class="text-neutral-500 hover:text-red-400 text-xs transition-colors p-1"
+                                    type="button">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                            </div>
+                            <!-- Interactive Steppers Row -->
+                            <div class="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/5">
+                                <!-- Stepper: Repetições -->
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Reps</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementValue('reps-3')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="reps-3">10</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementValue('reps-3')" type="button">+</button>
+                                    </div>
+                                </div>
+                                <!-- Stepper: Intervalo -->
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span
+                                        class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Intervalo (min)</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementInterval('rest-3')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="rest-3">1 min</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementInterval('rest-3')" type="button">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- Card 4: Remada Baixa Triângulo -->
+                <article
+                    class="bg-[#111317] rounded-2xl p-3.5 border border-[#1E2128] relative shadow-lg overflow-hidden group">
+                    <div class="flex gap-3.5 items-center">
+                        <div
+                            class="w-20 h-20 rounded-xl bg-[#090B0D] border border-white/5 flex flex-col items-center justify-center shrink-0 p-2 text-white/80">
+                            <i class="ph-fill ph-camera text-3xl text-neutral-300"></i>
+                            <span class="text-[9px] text-neutral-500 font-medium mt-1">Sem foto</span>
+                        </div>
+                        <div class="flex-1 pl-2.5 curved-accent-border flex flex-col gap-2">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-sm font-bold text-white tracking-tight leading-snug">Remada Baixa
+                                        Triângulo</h3>
+                                    <p class="text-[11px] text-neutral-400">Dorsal</p>
+                                </div>
+                                <button aria-label="Remover exercício"
+                                    class="text-neutral-500 hover:text-red-400 text-xs transition-colors p-1"
+                                    type="button">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/5">
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Reps</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementValue('reps-4')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="reps-4">10</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementValue('reps-4')" type="button">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span
+                                        class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Intervalo (min)</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementInterval('rest-4')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="rest-4">1 min</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementInterval('rest-4')" type="button">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- Card 5: Tríceps Corda -->
+                <article
+                    class="bg-[#111317] rounded-2xl p-3.5 border border-[#1E2128] relative shadow-lg overflow-hidden group">
+                    <div class="flex gap-3.5 items-center">
+                        <div
+                            class="w-20 h-20 rounded-xl bg-[#090B0D] border border-white/5 flex flex-col items-center justify-center shrink-0 p-2 text-white/80">
+                            <i class="ph-fill ph-camera text-3xl text-neutral-300"></i>
+                            <span class="text-[9px] text-neutral-500 font-medium mt-1">Sem foto</span>
+                        </div>
+                        <div class="flex-1 pl-2.5 curved-accent-border flex flex-col gap-2">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-sm font-bold text-white tracking-tight leading-snug">Tríceps Corda
+                                    </h3>
+                                    <p class="text-[11px] text-neutral-400">Tríceps</p>
+                                </div>
+                                <button aria-label="Remover exercício"
+                                    class="text-neutral-500 hover:text-red-400 text-xs transition-colors p-1"
+                                    type="button">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1.5 pt-1 border-t border-white/5">
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Reps</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementValue('reps-5')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="reps-5">12</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementValue('reps-5')" type="button">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center bg-[#17191F] py-1.5 px-1 rounded-lg border border-white/5"
+                                    data-purpose="stepper">
+                                    <span
+                                        class="text-[10px] text-neutral-400 font-medium uppercase mb-1">Intervalo (min)</span>
+                                    <div class="flex items-center justify-between w-full px-1">
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="decrementInterval('rest-5')" type="button">-</button>
+                                        <span class="text-xs font-bold text-white" id="rest-5">1 min</span>
+                                        <button
+                                            class="w-5 h-5 rounded-full bg-[#242731] hover:bg-red-600/40 text-neutral-200 flex items-center justify-center text-xs active:scale-95 transition-all"
+                                            onclick="incrementInterval('rest-5')" type="button">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+            <!-- END: ExerciseList -->
+        </div>
+        <!-- END: ScrollableContent -->
+        <!-- BEGIN: Floating Action Button (FAB) -->
+        <button aria-label="Adicionar Exercício"
+            class="absolute bottom-24 right-5 w-14 h-14 rounded-full bg-[#DC2626] hover:bg-[#B91C1C] active:scale-95 text-white flex items-center justify-center shadow-lg shadow-red-900/40 border border-white/10 z-30 transition-all group"
+            type="button">
+            <i class="ph-bold ph-plus-circle text-2xl group-hover:scale-110 transition-transform"></i>
+        </button>
+        <!-- END: Floating Action Button (FAB) -->
+        <footer
+            class="w-full bg-[#111317]/95 backdrop-blur-md border-t border-[#1C1F26] px-4 py-3 z-30 shrink-0"
+            data-purpose="save-action">
+            <button
+                class="w-full bg-[#181B22] hover:bg-[#20242E] active:scale-[0.98] text-neutral-200 font-medium text-sm py-3 px-4 rounded-xl border border-neutral-800 transition-all flex items-center justify-center gap-2"
+                type="button">
+                <i class="ph-bold ph-floppy-disk text-base text-red-500"></i>
+                <span>Salvar treino</span>
+            </button>
+        </footer>
+    </main>
+    <!-- END: MobileDeviceFrame -->
+    <!-- BEGIN: InteractiveStepperScript -->
+    <script data-purpose="stepper-interactivity">
+        // Helper function to increment plain integer values
+        function incrementValue(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                let val = parseInt(el.textContent, 10) || 0;
+                if (val < 99) {
+                    el.textContent = val + 1;
+                }
+            }
+        }
+
+        // Helper function to decrement plain integer values
+        function decrementValue(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                let val = parseInt(el.textContent, 10) || 0;
+                if (val > 1) {
+                    el.textContent = val - 1;
+                }
+            }
+        }
+
+        // The app stores rest intervals in whole minutes.
+        function incrementInterval(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                let currentMinutes = parseInt(el.textContent, 10) || 0;
+                if (currentMinutes < 60) {
+                    el.textContent = (currentMinutes + 1) + ' min';
+                }
+            }
+        }
+
+        function decrementInterval(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                let currentMinutes = parseInt(el.textContent, 10) || 0;
+                if (currentMinutes > 0) {
+                    el.textContent = (currentMinutes - 1) + ' min';
+                }
+            }
+        }
+    </script>
+    <!-- END: InteractiveStepperScript -->
+</body>
+
+</html>

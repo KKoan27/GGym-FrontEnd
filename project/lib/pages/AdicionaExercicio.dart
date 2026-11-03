@@ -9,14 +9,12 @@ class AdicionaExercicio extends StatefulWidget {
 }
 
 class AdicionaExercicioState extends State<AdicionaExercicio> {
-
-  ExercicioService  exercicioService =  ExercicioService();
+  ExercicioService exercicioService = ExercicioService();
 
   late Future<List<Exercicio>> exercicioFuture;
   List<int> selectedIndex = [];
   TextEditingController searchController = TextEditingController();
   String search = "";
-
 
   List<Exercicio> bodySelect = [];
 
@@ -27,10 +25,9 @@ class AdicionaExercicioState extends State<AdicionaExercicio> {
         children: [
           TextField(
             controller: searchController,
-            onChanged: (texto) => 
-            setState(() {
+            onChanged: (texto) => setState(() {
               search = texto;
-            })
+            }),
           ),
           Expanded(
             child: FutureBuilder(
@@ -42,34 +39,38 @@ class AdicionaExercicioState extends State<AdicionaExercicio> {
                   }
                   // if (snapshot.connectionState == ConnectionState.waiting) {}
                   if (snapshot.hasData) {
-
-                   final filtrados = exercicioService.filterExercicio(snapshot.data!, search);
+                    final filtrados = exercicioService.filterExercicio(
+                      snapshot.data!,
+                      search,
+                    );
                     return ListView.builder(
                       itemCount: filtrados.length,
                       itemBuilder: (context, index) {
-                        var musculosAlvo = filtrados[index].musculosAlvo
-                            .join(',');
+                        var musculosAlvo = filtrados[index].musculosAlvo.join(
+                          ',',
+                        );
 
-                        final bool selecionado = bodySelect.contains(filtrados[index]);
+                        final bool selecionado = bodySelect.contains(
+                          filtrados[index],
+                        );
 
                         return Card(
                           elevation: 3,
                           color: selecionado ? Colors.red[700] : Colors.black38,
                           margin: EdgeInsets.all(10),
- 
+
                           child: CheckboxListTile(
                             title: Text(filtrados[index].nome),
                             subtitle: Text(musculosAlvo),
 
                             value: selecionado,
-                            onChanged: (value)=> setState(() {
-                                if (selecionado) {
-                                  bodySelect.remove(filtrados[index]);
-                                } else {
-                                  bodySelect.add(filtrados[index]);
-                                }
-                              })
-                            ,
+                            onChanged: (value) => setState(() {
+                              if (selecionado) {
+                                bodySelect.remove(filtrados[index]);
+                              } else {
+                                bodySelect.add(filtrados[index]);
+                              }
+                            }),
                           ),
                         );
                       },
@@ -82,7 +83,7 @@ class AdicionaExercicioState extends State<AdicionaExercicio> {
               },
             ),
           ),
-          ElevatedButton(
+          FloatingActionButton(
             onPressed: (() => Navigator.pop(context, bodySelect)),
             child: Text("Add"),
           ),
@@ -93,13 +94,10 @@ class AdicionaExercicioState extends State<AdicionaExercicio> {
 
   @override
   void initState() {
-super.initState();
+    super.initState();
 
-    exercicioFuture =  exercicioService.fetchExercicios();
-    
+    exercicioFuture = exercicioService.fetchExercicios();
   }
 
-  
   // Conceito adaptado para sua classe AdicionaExercicioState:
-
 }
