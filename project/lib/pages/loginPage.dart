@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 // Certifique-se de que este import aponte para sua classe UserModel
 import 'package:project/models/usuario.dart';
+import 'package:project/services/exercicio_service.dart';
 import 'package:project/services/user_service.dart';
-import 'resetarSenhaPage.dart';
-import 'cadastroPage.dart';
-import 'homePage.dart';
+import 'ResetarSenhaPage.dart';
+import 'CadastroPage.dart';
+import 'HomePage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,11 +35,9 @@ class _LoginScreenState extends State<LoginScreen> {
     // 2. Chamar a função de consumo (o serviço de login)
     // A função 'login' (importada de login_service.dart) já cuida
     // da chamada HTTP, dos SnackBar de erro e de salvar em SharedPreferences.
-    UserModel? user = await UserServiceClient("https://ggym-backend.onrender.com/user/auth").login(
-      _emailController.text,
-      _senhaController.text,
-      context,
-    );
+    UserModel? user = await UserServiceClient(
+      "https://ggym-backend.onrender.com/user/auth",
+    ).login(_emailController.text, _senhaController.text, context);
 
     setState(() {
       _isLoading = false;
@@ -49,7 +48,10 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushAndRemoveUntil(
         context,
         // Usamos o 'pushAndRemoveUntil' para que o usuário não volte para o Login
-        MaterialPageRoute(builder: (context) => HomePage(user: user)),
+        MaterialPageRoute(
+          builder: (context) =>
+              HomePage(user: user, exercicioService: ExercicioService()),
+        ),
         (route) => false, // Remove todas as rotas anteriores
       );
     }

@@ -21,45 +21,37 @@ class _CadastroPageState extends State<CadastroPage> {
   bool cadastrando = false;
 
   void _realizarCadastro() async {
+    try {
+      // Validação básica
+      if (_senhaController.text != _confirmaSenhaController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("As senhas não coincidem!")),
+        );
+        return;
+      }
 
-try{
+      setState(() {
+        cadastrando = true;
+      });
+      // Aqui você conectaria com o backend
+      // print("Cadastrando: ${_nomeController.text}, ${_emailController.text}");
+      register({
+        'nome': _nomeController.text,
+        'email': _emailController.text,
+        'senha': _senhaController.text,
+      }, context);
 
-    // Validação básica
-    if (_senhaController.text != _confirmaSenhaController.text) {
+      // Vai direto para a Home após cadastro
+    } on Exception {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("As senhas não coincidem!")));
-      return;
-    }
-
-setState((){
-cadastrando = true;
-});
-    // Aqui você conectaria com o backend
-    // print("Cadastrando: ${_nomeController.text}, ${_emailController.text}");
-
-    
-register({
-      'nome': _nomeController.text,
-      'email': _emailController.text,
-      'senha': _senhaController.text,
-    }, context);
-
-
-    // Vai direto para a Home após cadastro
-  } on Exception {
-ScaffoldMessenger.of(
-          context,
-                  ).showSnackBar(SnackBar(content: Text("Erro ao cadastrar!")));
-   
-    } finally{
-      setState((){
-cadastrando = false;
-});
+      ).showSnackBar(SnackBar(content: Text("Erro ao cadastrar!")));
+    } finally {
+      setState(() {
+        cadastrando = false;
+      });
     }
   }
-
-   
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +64,6 @@ cadastrando = false;
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      // Stack para manter o fundo se quiser adicionar as imagens de background depois
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(30.0),
@@ -132,18 +123,19 @@ cadastrando = false;
                   ),
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child:  cadastrando ?CircularProgressIndicator(
-                          color: Colors.white, // Cor do indicador
-                          strokeWidth: 2.5,
-                        ):
-                         const Text(
-                  'Cadastrar',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                child: cadastrando
+                    ? CircularProgressIndicator(
+                        color: Colors.white, // Cor do indicador
+                        strokeWidth: 2.5,
+                      )
+                    : const Text(
+                        'Cadastrar',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
               ),
             ],
           ),
@@ -169,5 +161,42 @@ cadastrando = false;
     );
   }
 
-  
+  Future<void> register(Map<String, String> body, BuildContext context) async {
+    Map<String, String?> requestbody = {
+      "nome": body['nome'],
+      "email": body['email'],
+      "senha": body['senha'],
+    };
+
+    try {
+      var result = await http.post(
+        Uri.parse("https://ggym-backend.onrender.com/user/register"),
+        body: jsonEncode(requestbody),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (result.statusCode == 400) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Erro ao cadastrar!")));
+        throw Exception("erro na requisição : ${result.body}");
+      } else if (result.statusCode == 200) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Cadastro completo!")));
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+          (route) => false,
+        );
+      }
+    } on Exception {
+      rethrow;
+    } finally {
+      setState(() {
+        cadastrando = false;
+      });
+    }
+  }
 }

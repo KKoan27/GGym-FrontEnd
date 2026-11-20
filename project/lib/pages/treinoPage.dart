@@ -65,8 +65,7 @@ class _TreinoPageState extends State<TreinoPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              Playtrainpage(treino: treino),
+                          builder: (context) => Playtrainpage(treino: treino),
                         ),
                       );
                     },
@@ -90,6 +89,37 @@ class _TreinoPageState extends State<TreinoPage> {
                               color: Colors.grey[700],
                             ),
                           ),
+                          PopupMenuButton(
+                            itemBuilder: (context) => <PopupMenuEntry<String>>[
+                              const PopupMenuItem<String>(
+                                value: 'editar',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.edit, size: 20),
+                                    SizedBox(width: 8),
+                                    Text('Editar'),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'deletar',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Deletar',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -100,12 +130,14 @@ class _TreinoPageState extends State<TreinoPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.playlist_add_rounded),
         onPressed: () async {
-          final bool? treinoAdicionado = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MontagemTreino(user: widget.user),
-            ),
-          ) as bool?;
+          final bool? treinoAdicionado =
+              await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MontagemTreino(user: widget.user),
+                    ),
+                  )
+                  as bool?;
 
           if (treinoAdicionado == true) {
             _loadTreinos();

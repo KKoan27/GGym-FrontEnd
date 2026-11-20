@@ -4,7 +4,9 @@ import 'package:project/services/exercicio_service.dart';
 import 'package:project/pages/detalheExerciciosPage.dart';
 
 class ListaExerciciosPage extends StatefulWidget {
-  const ListaExerciciosPage({super.key});
+  final ExercicioService exercicioService;
+
+  const ListaExerciciosPage({super.key, required this.exercicioService});
 
   @override
   // Usei StatefulWidget pois a lista precisa ser atualizada
@@ -13,13 +15,14 @@ class ListaExerciciosPage extends StatefulWidget {
 }
 
 class _ListaExerciciosPageState extends State<ListaExerciciosPage> {
-  final ExercicioService _exercicioService = ExercicioService();
+  late final ExercicioService _service;
 
   // [TÉCNICO] Variável que guarda o estado da promessa (Future).
   // Armazeno o Future numa variável para evitar que a requisição
   // seja refeita toda vez que o teclado abre ou a tela recarrega (build).
   late Future<List<Exercicio>> _futureExercicios;
-   String search = "";
+  static List<Exercicio>? _cacheLocalExercicios;
+  String search = "";
 
   // [TÉCNICO] Controlador para ler o texto do input de busca.
   final TextEditingController _searchController = TextEditingController();
@@ -27,8 +30,19 @@ class _ListaExerciciosPageState extends State<ListaExerciciosPage> {
   @override
   void initState() {
     super.initState();
-    // [TÉCNICO] Carrega a lista completa ao iniciar a tela.
-    _futureExercicios = _exercicioService.fetchExercicios();
+
+    _service = widget.exercicioService;
+
+    if (_cacheLocalExercicios != null) {
+      // Se já temos os dados salvos estaticamente, usamos eles sem chamar o serviço
+      _futureExercicios = Future.value(_cacheLocalExercicios!);
+    } else {
+      // Se não temos, buscamos do serviço e guardamos no cache estático
+      _futureExercicios = _service.fetchExercicios().then((dados) {
+        _cacheLocalExercicios = dados;
+        return dados;
+      });
+    }
   }
 
   @override
@@ -43,7 +57,7 @@ class _ListaExerciciosPageState extends State<ListaExerciciosPage> {
     setState(() {
       // [TÉCNICO] Ao mudar o _futureExercicios dentro do setState,
       // forçamos o FutureBuilder a rodar de novo com o novo parâmetro (query).
-      _futureExercicios = _exercicioService.fetchExercicios(
+      _futureExercicios = _service.fetchExercicios(
         query: _searchController.text,
       );
     });
@@ -67,11 +81,9 @@ class _ListaExerciciosPageState extends State<ListaExerciciosPage> {
           child: TextField(
             controller: _searchController,
             onChanged: (value) {
-              setState((){
-search = value;
+              setState(() {
+                search = value;
               });
-
-              
             },
             // O decoration é uma propriedade do TextField, fica fora do onChanged
             decoration: const InputDecoration(
@@ -130,7 +142,7 @@ search = value;
 
           // 4. SUCESSO
           final exercicios = snapshot.data!;
-          final exerciciosFilter = _exercicioService.filterExercicio(exercicios, search);
+          final exerciciosFilter = _service.filterExercicio(exercicios, search);
 
           // [PERFORMANCE] ListView.separated é melhor que ListView padrão para listas grandes
           // pois renderiza apenas o que está na tela.
