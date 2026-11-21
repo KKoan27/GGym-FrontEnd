@@ -133,14 +133,6 @@ class MontagemTreinoState extends State<MontagemTreino> {
             const SizedBox(height: 24),
             Row(
               children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: _accentColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
@@ -293,7 +285,7 @@ class MontagemTreinoState extends State<MontagemTreino> {
             label: const Text('Adicionar exercícios'),
             style: OutlinedButton.styleFrom(
               foregroundColor: const Color(0xFFFF718B),
-              side: const BorderSide(color: Color(0xFF652032)),
+              side: const BorderSide(color: Color.fromARGB(255, 185, 1, 50)),
             ),
           ),
         ],
