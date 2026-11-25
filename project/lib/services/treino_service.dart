@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project/models/exercicio.dart';
 import 'package:project/models/treino.dart';
@@ -16,11 +17,9 @@ class TreinoService {
       return [];
     }
 
-    final uri = Uri.parse(_baseUrl).replace(
-      queryParameters: {
-        'userid': userId,
-      },
-    );
+    final uri = Uri.parse(
+      _baseUrl,
+    ).replace(queryParameters: {'userid': userId});
 
     final response = await http.get(
       uri,
@@ -87,5 +86,12 @@ class TreinoService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  editarTreino() async {}
+
+  deletarTreino(Treino treino) async {
+
+    treino.Jso
   }
 }

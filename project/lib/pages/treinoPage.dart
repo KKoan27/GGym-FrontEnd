@@ -81,16 +81,13 @@ class _TreinoPageState extends State<TreinoPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 128,
+              height: 64,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
                   Opacity(
                     opacity: 0.65,
-                    child: Image.asset(
-                      'assets/GymImage.jpg',
-                      fit: BoxFit.cover,
-                    ),
+                    child: Icon(Icons.sports_gymnastics_outlined),
                   ),
                   const DecoratedBox(
                     decoration: BoxDecoration(
@@ -102,29 +99,6 @@ class _TreinoPageState extends State<TreinoPage> {
                           Color(0x8014171A),
                           _cardColor,
                         ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 12,
-                    left: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _accentColor,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        'TREINO ${(index + 1).toString().padLeft(2, '0')}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.55,
-                        ),
                       ),
                     ),
                   ),
@@ -188,7 +162,7 @@ class _TreinoPageState extends State<TreinoPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     itemBuilder: (context) => <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
+                      PopupMenuItem<String>(
                         value: 'editar',
                         child: Row(
                           children: [
@@ -198,7 +172,7 @@ class _TreinoPageState extends State<TreinoPage> {
                           ],
                         ),
                       ),
-                      const PopupMenuItem<String>(
+                      PopupMenuItem<String>(
                         value: 'deletar',
                         child: Row(
                           children: [
@@ -210,6 +184,7 @@ class _TreinoPageState extends State<TreinoPage> {
                             ),
                           ],
                         ),
+                        onTap: _treinoService.deletarTreino(treino),
                       ),
                     ],
                   ),
@@ -252,23 +227,6 @@ class _TreinoPageState extends State<TreinoPage> {
       ),
       body: Stack(
         children: [
-          Positioned(
-            top: -100,
-            right: -100,
-            child: Container(
-              width: 280,
-              height: 280,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    _accentColor.withValues(alpha: 0.2),
-                    _accentColor.withValues(alpha: 0),
-                  ],
-                ),
-              ),
-            ),
-          ),
           SafeArea(
             top: false,
             child: ListView(
@@ -318,12 +276,13 @@ class _TreinoPageState extends State<TreinoPage> {
                     ),
                   )
                 else
-                  ...treinos.indexed.map(
-                    (entry) => Padding(
+                  ...treinos.indexed.map((item) {
+                    final (index, treino) = item;
+                    return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildWorkoutCard(entry.$2, entry.$1),
-                    ),
-                  ),
+                      child: _buildWorkoutCard(treino, index),
+                    );
+                  }),
                 const SizedBox(height: 8),
                 SizedBox(
                   height: 56,
@@ -356,76 +315,3 @@ class _TreinoPageState extends State<TreinoPage> {
     );
   }
 }
-
-//  PRIMEIRO CÓDIGO FEITO //
-
-// import 'package:flutter/material.dart';
-
-// class TreinoPage extends StatefulWidget {
-//   const TreinoPage({super.key});
-
-//   @override
-//   State<TreinoPage> createState() => _TreinoPageState();
-// }
-
-// class _TreinoPageState extends State<TreinoPage> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Meus Treinos"),
-//       ),
-
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: ListView(
-//           children: [
-//             Card(
-//               elevation: 4,
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(12),
-//               ),
-//               child: Padding(
-//                 padding: const EdgeInsets.all(16.0),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       "Treino A",
-//                       style: TextStyle(
-//                         fontSize: 16,
-//                         fontWeight: FontWeight.bold,
-//                       ),
-//                     ),
-//                     SizedBox(height: 4),
-//                     Text(
-//                       "Nome do treino",
-//                       style: TextStyle(
-//                         fontSize: 15,
-//                       ),
-//                     ),
-//                     SizedBox(height: 8),
-//                     Text(
-//                       "Exemplo: 5 exercícios · Foco: Hipertrofia",
-//                       style: TextStyle(
-//                         fontSize: 13,
-//                         color: Colors.grey,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-
-//       floatingActionButton: FloatingActionButton(
-//         child: Icon(Icons.playlist_add_rounded),
-//         onPressed: () {
-//           Navigator.pushNamed(context, '/addtreino');
-//         },
-//       ),
-//     );
-//   }
-// }
